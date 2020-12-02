@@ -1,0 +1,238 @@
+#include<iostream>
+#include<string>
+#include<vector>
+using namespace std;
+class NgayThangNam
+{
+public:
+	NgayThangNam();
+	~NgayThangNam();
+	friend istream& operator >>(istream &,NgayThangNam &);
+	friend ostream& operator <<(ostream & ,NgayThangNam );
+private:
+	int Ngay_,Thang_,Nam_;
+};
+NgayThangNam::NgayThangNam()
+{
+	Ngay_=Thang_=Nam_=0;
+}
+NgayThangNam::~NgayThangNam()
+{}
+istream& operator >>(istream &is,NgayThangNam &ngay)
+{
+	cout<<"\nNhap Ngay :";is>>ngay.Ngay_;
+	cout<<"\nNhap Thang: ";is>>ngay.Thang_;
+	cout<<"\nNhap Nam :";is>>ngay.Nam_;
+	return is;
+}
+ostream& operator <<(ostream &os ,NgayThangNam ngay )
+{
+	os<<"\n"<<ngay.Ngay_<<" / "<<ngay.Thang_<<" / "<<ngay.Nam_<<endl;
+	return os;
+}
+class DocGia
+{
+public:
+	DocGia();
+	~DocGia();
+	virtual void Nhap();
+	virtual void Xuat();
+	virtual unsigned int TinhTienLamThe()=0;
+protected:
+	string Ten_;
+	NgayThangNam ngay_;
+	int SoThangHieuLuc_;
+};
+DocGia::DocGia()
+{
+	Ten_="";
+	SoThangHieuLuc_=0;
+}
+DocGia::~DocGia(){}
+void DocGia::Nhap()
+{
+	cout<<"\nNhap Ten :";
+	fflush(stdin);
+	getline(cin,Ten_);
+	cout<<"\nNhap Ngay Thang Nam Lam The: " ;cin>>ngay_;
+	cout<<"\nNhap So thang hieu luc cua the: ";cin>>SoThangHieuLuc_;
+}
+void DocGia::Xuat()
+{
+	cout<<"\nHo va ten: "<<Ten_;
+	cout<<"\nNgay Thang Nam Lam the: "<<ngay_;
+	cout<<"\nSo Thang Hieu Luc Cua The : "<<SoThangHieuLuc_;
+}
+class DocGiaTreEm:public DocGia
+{
+public:
+	DocGiaTreEm(); ~DocGiaTreEm();
+	void Nhap();
+	void Xuat();
+	unsigned int TinhTienLamThe();
+private:
+	string NguoiDaiDien_;
+	unsigned int TienLamTheTE_;
+};
+DocGiaTreEm::DocGiaTreEm()
+{
+	NguoiDaiDien_="";TienLamTheTE_=0;
+}
+DocGiaTreEm::~DocGiaTreEm()
+{
+}
+unsigned int DocGiaTreEm::TinhTienLamThe()
+{
+	TienLamTheTE_=20000;
+	return TienLamTheTE_;
+}
+void DocGiaTreEm::Nhap()
+{
+	DocGia::Nhap();
+	cout<<"\nNhap Ten Nguoi Dai Diem:";
+	fflush(stdin);
+	getline(cin,NguoiDaiDien_);
+}
+void DocGiaTreEm::Xuat()
+{
+	cout<<"\n**************************************";
+	DocGia::Xuat();
+	cout<<"\nNguoi Dai Dien: "<<NguoiDaiDien_;
+	cout<<"\nTien Lam The :"<<TinhTienLamThe();
+	cout<<"\n**************************************";
+}
+class DocGiaNguoiLon:public DocGia
+{
+public:
+	DocGiaNguoiLon();
+	~DocGiaNguoiLon();
+	void Nhap();
+	void Xuat();
+	unsigned int TinhTienLamThe();
+private:
+	string CMND_;
+	unsigned int TienLamTheNL_;
+};
+DocGiaNguoiLon::DocGiaNguoiLon()
+{
+	CMND_="";TienLamTheNL_=0;
+}
+DocGiaNguoiLon::~DocGiaNguoiLon()
+{}
+unsigned int DocGiaNguoiLon::TinhTienLamThe()
+{
+	return SoThangHieuLuc_*10000;
+}
+void DocGiaNguoiLon::Nhap()
+{
+	DocGia::Nhap();
+	cout<<"\nNhap CMND:";fflush(stdin);getline(cin,CMND_);
+}
+void DocGiaNguoiLon::Xuat()
+{
+	cout<<"\n**************************************";
+	DocGia::Xuat();
+	cout<<"\nCMND : "<<CMND_;
+	cout<<"\nTien Lam The :"<<TinhTienLamThe();
+	cout<<"\n**************************************";
+}
+class CThuVien
+{
+public:
+	void NhapDanhSach();
+	void XuatDanhSach();
+	void TinhTongTien();
+private:
+	vector<DocGia *> docgia_;
+};
+void CThuVien::NhapDanhSach()
+{
+	DocGia * docgia;
+	int chon;
+	do
+	{
+		system("cls");
+		cout<<"********************QUAN LI THU VIEN******************************";
+		cout<<"\n\t\t\t ban da chon vao muc Them Doc Gia.";
+		cout<<"\n\t\t\t1.Them Doc Gia Tre Em.";
+		cout<<"\n\t\t\t2.Them Doc Gia Nguoi Lon.";
+		cout<<"\n\t\t\t3.Quay Lai!";
+		cout<<"\n\t\t\tLua chon!";
+		cin>>chon;
+		switch (chon)
+		{
+		case 1:
+			{
+				docgia=new DocGiaTreEm;
+				docgia->Nhap();
+				docgia_.push_back(docgia);
+			}
+			break;
+		case 2:
+			{
+				docgia =new DocGiaNguoiLon;
+				docgia->Nhap();
+				docgia_.push_back(docgia);
+			}
+			break;
+		default:
+			break;
+		}
+	}while(chon!=3);
+}
+void CThuVien::XuatDanhSach()
+{
+	system("cls");
+	cout<<"\nDanh sach doc gia.\n";
+	for(int i=0;i<docgia_.size();i++)
+	{
+		docgia_[i]->Xuat();
+	}
+	system("pause>pls");
+}
+void CThuVien::TinhTongTien()
+{
+	system("cls");
+	unsigned int S=0;
+	for(int i=0;i<docgia_.size();i++)
+	{
+		S=S+docgia_[i]->TinhTienLamThe();
+	} 
+	cout<<"\nTong Tien Lam The :"<<S;
+	system("pause>pls");
+}
+void Menu(CThuVien &thuvien)
+{
+	int chon;
+	do
+	{
+		system("cls");
+		cout<<"********************QUAN LI THU VIEN*************************************";
+		cout<<"\n1.Them Doc gia.";
+		cout<<"\n2.Liet ke danh sach doc gia.";
+		cout<<"\n3.Tinh Tien Lam the.";
+		cout<<"\n4.Thoat!"<<endl;
+		cin>>chon;
+		switch (chon)
+		{
+		case 1:
+			thuvien.NhapDanhSach();
+			break;
+		case 2:
+			thuvien.XuatDanhSach();
+			break;
+		case 3:
+			thuvien.TinhTongTien();
+			break;
+		default:
+			break;
+		}
+	} while (chon!=4);
+}
+int main()
+{
+	CThuVien thuvien;
+	Menu(thuvien);
+	system("pause");
+	return 0;
+}
